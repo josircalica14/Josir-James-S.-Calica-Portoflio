@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Contact Josir James Calica - front-end developer and photo editor behind Cup of Jay">
-    <title>Contact | Cup of Jay</title>
+    <title>Contact | Josir James S. Calica</title>
     <link rel="stylesheet" href="style.css?v=24">
-    <link rel="stylesheet" href="css/contact.css?v=6">
+    <link rel="stylesheet" href="css/contact.css?v=8">
     <link rel="stylesheet" href="css/socials.css">
     <link rel="stylesheet" href="theme-toggle.css">
     <!-- EmailJS SDK for direct email sending -->
@@ -161,7 +161,7 @@
             </div>
 
             <!-- EMAIL ME — spotlight card CTA; scrolls to the form -->
-            <a class="ct-cta-card" id="ct-magnet" href="#ct-email-me" role="button" aria-label="Scroll down to the contact form">
+            <a class="ct-cta-card" id="ct-magnet" href="javascript:void(0)" role="button" aria-label="Scroll down to the contact form">
                 <span class="ct-cta-card__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.548l6.545-4.91C20.44 2.28 24 3.434 24 5.457z"/></svg></span>
                 <span class="ct-cta-card__txt">
                     <span class="t">Email me instead</span>
@@ -179,7 +179,7 @@
         </div>
 
         <!-- ── Form: conversational stepper, composes an email to the Gmail inbox ── -->
-        <section class="ct-form-wrap" data-scroll-target>
+        <section class="ct-form-wrap" id="ct-email-me" data-scroll-target>
             <div class="ct-form-head">
                 <div class="k">Write your email here</div>
                 <h2>One question at a time — then it opens in your mail app, ready to send.</h2>
@@ -216,249 +216,37 @@
 
     </main>
 
-    <script>
-        // ── Contact page interactions: spotlight CTA, FAQ card, mailto form ──
-        (function () {
-            // Spotlight tracking on the CTA card (cursor-following glow).
-            const cta = document.getElementById('ct-magnet');
-            if (cta && window.matchMedia('(hover: hover)').matches) {
-                cta.addEventListener('mousemove', (e) => {
-                    const r = cta.getBoundingClientRect();
-                    cta.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
-                    cta.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
-                });
-            }
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="#22cdda" stroke-width="2"/>
+                    <path d="M8 12L11 15L16 9" stroke="#22cdda" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h2 class="modal-title">Message Sent Successfully!</h2>
+            <p class="modal-message">Thanks <span id="modal-name"></span>! Your message has been sent.</p>
+            <p class="modal-submessage">You'll receive a confirmation email, and I'll get back to you within 24 hours. (Check your spam folder if you don't see it)</p>
+            <button class="modal-close-btn" onclick="closeSuccessModal()">Got it</button>
+        </div>
+    </div>
 
-            // Spotlight tracking on the info card.
-            const card = document.getElementById('ct-card');
-            if (card) {
-                card.addEventListener('mousemove', (e) => {
-                    const r = card.getBoundingClientRect();
-                    card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
-                    card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
-                });
-            }
-
-            // EMAIL ME button: smooth-scroll to the form below.
-            const emailBtn = document.getElementById('ct-magnet');
-            if (emailBtn) {
-                emailBtn.addEventListener('click', (e) => {
-                    const target = document.querySelector('.ct-form-wrap');
-                    if (target) {
-                        e.preventDefault();
-                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        // Move focus to the first field for keyboard users
-                        setTimeout(() => document.getElementById('ct-name')?.focus({ preventScroll: true }), 650);
-                    }
-                });
-            }
-
-            // ── Conversational stepper form → EmailJS direct send ──
-            const form = document.getElementById('ct-form');
-            if (form) {
-                // Initialize EmailJS with your public key
-                emailjs.init('xkIonYkjREJuw2mwJ');
-                
-                const steps = [...form.querySelectorAll('.ct-step')];
-                let step = 0;
-                let isSending = false;
-
-                const show = (n) => {
-                    steps[step].classList.remove('is-on');
-                    step = Math.max(0, Math.min(steps.length - 1, n));
-                    steps[step].classList.add('is-on');
-                    if (step === 1) {
-                        document.getElementById('ct-name-echo').textContent = document.getElementById('ct-name').value.trim() || 'you';
-                    }
-                };
-
-                const setError = (id, on) => document.getElementById(id).closest('.ct-step').classList.toggle('has-error', on);
-
-                const validateStep = (n) => {
-                    if (n === 0) {
-                        const name = document.getElementById('ct-name').value.trim();
-                        return !!name;
-                    }
-                    if (n === 1) {
-                        const email = document.getElementById('ct-email').value.trim();
-                        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-                    }
-                    if (n === 2) {
-                        const msg = document.getElementById('ct-message').value.trim();
-                        return !!msg;
-                    }
-                    return true;
-                };
-
-                const validateCurrent = () => {
-                    if (step === 0) {
-                        const name = document.getElementById('ct-name').value.trim();
-                        setError('ct-name', !name);
-                        return !!name;
-                    }
-                    if (step === 1) {
-                        const email = document.getElementById('ct-email').value.trim();
-                        const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-                        setError('ct-email', !ok);
-                        return ok;
-                    }
-                    if (step === 2) {
-                        const msg = document.getElementById('ct-message').value.trim();
-                        setError('ct-message', !msg);
-                        return !!msg;
-                    }
-                    return true;
-                };
-
-                form.querySelectorAll('.ct-step-next').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        if (step === 2) {
-                            // Final send: validate everything and send via EmailJS
-                            if (!(validateCurrent() && validateStep(0) && validateStep(1))) {
-                                if (!validateStep(0)) { show(0); return; }
-                                if (!validateStep(1)) { show(1); return; }
-                                return;
-                            }
-                            
-                            if (isSending) return;
-                            isSending = true;
-                            
-                            const name = document.getElementById('ct-name').value.trim();
-                            const email = document.getElementById('ct-email').value.trim();
-                            const message = document.getElementById('ct-message').value.trim();
-                            
-                            // Update button text to show sending
-                            btn.textContent = 'Sending...';
-                            btn.disabled = true;
-                            
-                            // Send email via EmailJS
-                            emailjs.send('service_c8ecwfs', 'template_lmepmoa', {
-                                from_name: name,
-                                reply_to: email,
-                                message: message,
-                                to_email: 'josirjamesc@gmail.com'
-                            }).then(
-                                function(response) {
-                                    console.log('Email sent successfully!', response.status, response.text);
-                                    show(3);
-                                    // Update final step message
-                                    steps[3].querySelector('.ct-q').innerHTML = 'Message sent! <em>I\'ll reply within 24 hours.</em>';
-                                    isSending = false;
-                                },
-                                function(error) {
-                                    console.error('Failed to send email:', error);
-                                    alert('Failed to send message. Please try again or email me directly at josirjamesc@gmail.com');
-                                    btn.textContent = 'Send it →';
-                                    btn.disabled = false;
-                                    isSending = false;
-                                }
-                            );
-                            return;
-                        }
-                        
-                        // Regular step progression
-                        if (validateCurrent()) show(step + 1);
-                    });
-                });
-
-                form.querySelectorAll('.ct-step-back').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        if (btn.classList.contains('ct-step-retry')) {
-                            show(0);
-                            form.reset();
-                        } else {
-                            show(step - 1);
-                        }
-                    });
-                });
-
-                // Clear error on input
-                form.querySelectorAll('.ct-step-input').forEach(inp => {
-                    inp.addEventListener('input', () => setError(inp.id, false));
-                });
-            }
-                let step = 0;
-
-                const show = (n) => {
-                    steps[step].classList.remove('is-on');
-                    step = Math.max(0, Math.min(steps.length - 1, n));
-                    steps[step].classList.add('is-on');
-                    if (step === 1) {
-                        document.getElementById('ct-name-echo').textContent = document.getElementById('ct-name').value.trim() || 'you';
-                    }
-                };
-
-                const setError = (id, on) => document.getElementById(id).closest('.ct-step').classList.toggle('has-error', on);
-
-                const validateCurrent = () => {
-                    if (step === 0) {
-                        const name = document.getElementById('ct-name').value.trim();
-                        setError('ct-name', !name);
-                        return !!name;
-                    }
-                    if (step === 1) {
-                        const email = document.getElementById('ct-email').value.trim();
-                        const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-                        setError('ct-email', !ok);
-                        return ok;
-                    }
-                    if (step === 2) {
-                        const msg = document.getElementById('ct-message').value.trim();
-                        setError('ct-message', !msg);
-                        return !!msg;
-                    }
-                    return true;
-                };
-
-                form.querySelectorAll('.ct-step-next').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        if (step === 2) {
-                            // Final send: validate everything, compose the email
-                            if (!(validateCurrent() && validateStep(0) && validateStep(1))) {
-                                // jump to the first failing step
-                                if (!validateStep(0)) { show(0); return; }
-                                show(1); return;
-                            }
-                            const name = document.getElementById('ct-name').value.trim();
-                            const email = document.getElementById('ct-email').value.trim();
-                            const message = document.getElementById('ct-message').value.trim();
-                            const subject = encodeURIComponent(`Project inquiry from ${name}`);
-                            const body = encodeURIComponent(`${message}\n\n— ${name}\nReply to: ${email}`);
-                            show(3);
-                            window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
-                            return;
-                        }
-                        if (validateCurrent()) show(step + 1);
-                    });
-                });
-
-                function validateStep(n) {
-                    if (n === 0) return !!document.getElementById('ct-name').value.trim();
-                    if (n === 1) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('ct-email').value.trim());
-                    return !!document.getElementById('ct-message').value.trim();
-                }
-
-                form.querySelectorAll('.ct-step-back').forEach(btn => {
-                    btn.addEventListener('click', () => show(step - 1));
-                });
-
-                // Enter advances (except in the textarea)
-                form.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.target.matches('textarea') && step < 3) {
-                        e.preventDefault();
-                        form.querySelectorAll('.ct-step-next')[step]?.click();
-                    }
-                });
-
-                // Clear error as soon as the user types
-                ['ct-name', 'ct-email', 'ct-message'].forEach(id => {
-                    document.getElementById(id).addEventListener('input', () => setError(id, false));
-                });
-            }
-        })();
-    </script>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <h3 class="loading-title">Sending your message...</h3>
+            <p class="loading-text">Please wait while we process your request</p>
+        </div>
+    </div>
 
     <script type="module" src="main.js?v=15"></script>
+    <script src="js/contact.js"></script>
     <script src="lib/libgif.js" defer></script>
     <script type="module" src="lib/web-pet-engine.js"></script>
 </body>
