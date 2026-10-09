@@ -257,9 +257,7 @@
             const form = document.getElementById('ct-form');
             if (form) {
                 // Initialize EmailJS with your public key
-                // SETUP REQUIRED: Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
-                // Get it from: https://dashboard.emailjs.com/admin/account
-                emailjs.init('YOUR_PUBLIC_KEY');
+                emailjs.init('xkIonYkjREJuw2mwJ');
                 
                 const steps = [...form.querySelectorAll('.ct-step')];
                 let step = 0;
@@ -334,9 +332,7 @@
                             btn.disabled = true;
                             
                             // Send email via EmailJS
-                            // SETUP REQUIRED: Replace 'YOUR_SERVICE_ID' and 'YOUR_TEMPLATE_ID'
-                            // Get them from: https://dashboard.emailjs.com/admin
-                            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+                            emailjs.send('service_c8ecwfs', 'template_lmepmoa', {
                                 from_name: name,
                                 reply_to: email,
                                 message: message,
